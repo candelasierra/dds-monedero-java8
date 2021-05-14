@@ -43,11 +43,6 @@ public class Movimiento {
     return !esDeposito;
   }
 
-  public void agregateA(Cuenta cuenta) { //Missplaced method
-    cuenta.setSaldo(calcularValor(cuenta));
-    cuenta.agregarMovimiento(this);
-  }
-
   public double calcularValor(Cuenta cuenta) { //duplicated code y missplaced method
     if (esDeposito) {
       return cuenta.getSaldo() + getMonto();
