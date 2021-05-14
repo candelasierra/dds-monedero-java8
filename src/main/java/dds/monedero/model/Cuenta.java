@@ -31,11 +31,11 @@ public class Cuenta {
   public void poner(double cuanto) {
     validarMontoNegativo(cuanto);
     validarMaximaCantidadDepositosDiarios(3);
-    agregarMovimiento(new Movimiento(LocalDate.now(), cuanto, true));
+    agregarMovimiento(new Deposito(LocalDate.now(), cuanto));
   }
 
   private void validarMaximaCantidadDepositosDiarios (int cantidadMaxima) {
-    if (getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= cantidadMaxima) {
+    if (getMovimientos().stream().filter(movimiento -> movimiento.fueDepositado(LocalDate.now())).count() >= cantidadMaxima) {
       throw new MaximaCantidadDepositosException("Ya excedio los " + cantidadMaxima + " depositos diarios");
     }
   }
@@ -44,7 +44,7 @@ public class Cuenta {
     validarMontoNegativo(cuanto);
     validarSaldoSuficiente(cuanto);
     validarMaximaExtraccionDiaria(cuanto, 1000);
-    agregarMovimiento(new Movimiento(LocalDate.now(), cuanto, false));
+    agregarMovimiento(new Extraccion(LocalDate.now(), cuanto));
   }
 
   private void validarMaximaExtraccionDiaria (double monto, double maximaExtraccion){
@@ -75,7 +75,7 @@ public class Cuenta {
 
   public double getMontoExtraidoA(LocalDate fecha) {
     return getMovimientos().stream()
-        .filter(movimiento -> !movimiento.isDeposito() && movimiento.getFecha().equals(fecha))
+        .filter(movimiento -> movimiento.fueExtraido(LocalDate.now()))
         .mapToDouble(Movimiento::getMonto)
         .sum();
   }
