@@ -28,29 +28,38 @@ public class Cuenta {
     this.movimientos = movimientos;
   }
 
-  public void poner(double cuanto) { //long method
+  public void poner(double cuanto) {
     validarMontoNegativo(cuanto);
-
-    if (getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= 3) {
-      throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
-    }
+    validarMaximaCantidadDepositosDiarios(3);
     agregarMovimiento(new Movimiento(LocalDate.now(), cuanto, true));
   }
 
-  public void sacar(double cuanto) { //long method
-    validarMontoNegativo(cuanto);
-
-    if (getSaldo() - cuanto < 0) {
-      throw new SaldoMenorException("No puede sacar mas de " + getSaldo() + " $");
+  private void validarMaximaCantidadDepositosDiarios (int cantidadMaxima) {
+    if (getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= cantidadMaxima) {
+      throw new MaximaCantidadDepositosException("Ya excedio los " + cantidadMaxima + " depositos diarios");
     }
+  }
+
+  public void sacar(double cuanto) {
+    validarMontoNegativo(cuanto);
+    validarSaldoSuficiente(cuanto);
+    validarMaximaExtraccionDiaria(cuanto, 1000);
+    agregarMovimiento(new Movimiento(LocalDate.now(), cuanto, false));
+  }
+
+  private void validarMaximaExtraccionDiaria (double monto, double maximaExtraccion){
     double montoExtraidoHoy = getMontoExtraidoA(LocalDate.now());
-    double limite = 1000 - montoExtraidoHoy;
-    if (cuanto > limite) {
-      throw new MaximoExtraccionDiarioException("No puede extraer mas de $ " + 1000
+    double limite = maximaExtraccion - montoExtraidoHoy;
+    if (monto > limite) {
+      throw new MaximoExtraccionDiarioException("No puede extraer mas de $ " + maximaExtraccion
           + " diarios, límite: " + limite);
     }
+  }
 
-    agregarMovimiento(new Movimiento(LocalDate.now(), cuanto, false));
+  private void validarSaldoSuficiente(double monto){
+    if (getSaldo() - monto < 0) {
+      throw new SaldoMenorException("No puede sacar mas de " + getSaldo() + " $");
+    }
   }
 
   private void validarMontoNegativo (double monto){
