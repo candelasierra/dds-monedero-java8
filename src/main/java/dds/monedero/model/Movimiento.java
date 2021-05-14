@@ -43,11 +43,11 @@ public class Movimiento {
     return !esDeposito;
   }
 
-  public double calcularValor(Cuenta cuenta) { //duplicated code y missplaced method
+  public double montoAAplicar() {
     if (esDeposito) {
-      return cuenta.getSaldo() + getMonto();
+      return getMonto();
     } else {
-      return cuenta.getSaldo() - getMonto();
+      return -getMonto();
     }
   }
 }
