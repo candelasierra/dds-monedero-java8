@@ -45,7 +45,7 @@ public class Movimiento {
 
   public void agregateA(Cuenta cuenta) { //Missplaced method
     cuenta.setSaldo(calcularValor(cuenta));
-    cuenta.agregarMovimiento(fecha, monto, esDeposito);
+    cuenta.agregarMovimiento(this);
   }
 
   public double calcularValor(Cuenta cuenta) { //duplicated code y missplaced method
